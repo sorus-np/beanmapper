@@ -1,0 +1,16 @@
+# Eclipse resources
+.classpath
+.project
+.settings
+
+# Maven resources
+target
+
+# Temporary files
+*.log
+*~
+
+# Java resources
+*.class
+*.jar
+*.war
