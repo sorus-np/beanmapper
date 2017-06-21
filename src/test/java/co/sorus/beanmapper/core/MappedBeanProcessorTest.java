@@ -48,4 +48,16 @@ public class MappedBeanProcessorTest {
                 .hasSourceEquivalentTo(generated);
     }
 
+    @Test
+    public void testRenamedProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTORenamedProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTORenamedPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTORenamedPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
+
 }

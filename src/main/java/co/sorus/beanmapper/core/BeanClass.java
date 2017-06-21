@@ -45,10 +45,30 @@ public class BeanClass {
         return false;
     }
 
+    public ExecutableElement getMethod(String name) {
+        for (ExecutableElement el : methods) {
+            if (el.getSimpleName().toString().equals(name))
+                return el;
+        }
+        return null;
+    }
+
+    public boolean hasProperty(String name) {
+        for (VariableElement el : properties) {
+            if (el.getSimpleName().toString().equals(name))
+                return true;
+        }
+        return false;
+    }
+
     public String accessor(String name, AccessType accessType) {
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         name = accessType.type() + name;
-        return name;
+
+        if (hasMethod(name))
+            return name;
+        else
+            return null;
     }
 
     public enum AccessType {

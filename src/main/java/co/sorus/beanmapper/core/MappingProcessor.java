@@ -57,6 +57,7 @@ public class MappingProcessor {
             AnnotationMirror annotation = getAnnotation(property, mappedFromType, false);
             prop.hasAnnotation = (annotation != null);
 
+            prop.value = prop.to.toString();
             if (annotation != null) {
                 prop.value = (String) getMethodValue(annotation, "value");
                 prop.mapper = (DeclaredType) getMethodValue(annotation, "using");
@@ -66,8 +67,10 @@ public class MappingProcessor {
 
         // Get FROM bean mapping
         for (BeanMapping.Property property : mapping.props) {
-            if (!property.hasAnnotation)
-                property.from = property.to;
+            if (fromBean.hasProperty(property.value)) {
+                String getter = fromBean.accessor(property.value, BeanClass.AccessType.GETTER);
+                property.from = fromBean.getMethod(getter);
+            }
         }
 
         return mapping;
@@ -97,7 +100,7 @@ public class MappingProcessor {
     private Object getMethodValue(AnnotationMirror annotation, String field) {
         Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotation.getElementValues();
         for (ExecutableElement element : map.keySet()) {
-            if (!element.getSimpleName().equals(field))
+            if (!element.getSimpleName().toString().equals(field))
                 continue;
 
             return map.get(element).getValue();

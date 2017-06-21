@@ -10,6 +10,9 @@ import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
 
 import freemarker.template.Configuration;
@@ -57,8 +60,8 @@ public class MapFileGenerator {
             index++;
 
             prop.put("fromType", type(property.from));
-            prop.put("fromGetter", accessor(property.from.toString(), "getter"));
-            prop.put("toSetter", accessor(property.from.toString(), "setter"));
+            prop.put("fromGetter", property.from.getSimpleName().toString());
+            prop.put("toSetter", accessor(property.to.toString(), "setter"));
 
             props.add(prop);
         }
@@ -98,6 +101,12 @@ public class MapFileGenerator {
     }
 
     private String type(Element element) {
-        return element.asType().toString();
+        if (element instanceof VariableElement)
+            return element.asType().toString();
+        else if (element instanceof ExecutableElement) {
+            TypeMirror returnType = ((ExecutableElement) element).getReturnType();
+            return returnType.toString();
+        }
+        return "";
     }
 }
