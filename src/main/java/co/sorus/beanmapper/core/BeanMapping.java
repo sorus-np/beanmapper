@@ -3,9 +3,9 @@ package co.sorus.beanmapper.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
+import javax.lang.model.element.VariableElement;
 
 public final class BeanMapping {
 
@@ -16,15 +16,16 @@ public final class BeanMapping {
     protected List<Property> props = new ArrayList<>();
 
     public static class Property {
-        protected Element to;
+        protected VariableElement to;
 
-        protected Element from;
+        protected ExecutableElement from;
 
         protected boolean hasAnnotation;
 
         protected String value;
 
-        protected DeclaredType mapper;
+        protected TypeElement mapperClass;
+        protected ExecutableElement mapperMethod;
 
     }
 }

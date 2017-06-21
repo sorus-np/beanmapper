@@ -9,7 +9,14 @@ public class ${toBean}Generator implements co.sorus.beanmapper.BeanMapper<${from
         <#list properties as prop>
         try {
             ${prop.fromType} prop${prop.index} = _from.${prop.fromGetter}();
+
+            <#if prop.mapperUsed == "true">
+            ${prop.mapperClass} mapper${prop.index} = new ${prop.mapperClass}();
+            _to.${prop.toSetter}( mapper${prop.index}.${prop.mapperMethod}(prop${prop.index}) );
+            <#else>
             _to.${prop.toSetter}(prop${prop.index});
+            </#if>
+
         } catch (NullPointerException e) {
         }
 

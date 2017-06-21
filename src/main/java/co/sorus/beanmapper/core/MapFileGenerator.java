@@ -63,6 +63,13 @@ public class MapFileGenerator {
             prop.put("fromGetter", property.from.getSimpleName().toString());
             prop.put("toSetter", accessor(property.to.toString(), "setter"));
 
+            prop.put("mapperUsed", "false");
+            if (property.mapperClass != null) {
+                prop.put("mapperUsed", "true");
+                prop.put("mapperClass", property.mapperClass.getQualifiedName().toString());
+                prop.put("mapperMethod", property.mapperMethod.getSimpleName().toString());
+            }
+
             props.add(prop);
         }
 
@@ -74,9 +81,9 @@ public class MapFileGenerator {
             Template template = cfg.getTemplate("beanmapper.ftl");
             String filename = root.get("qualifiedName") + "Generator";
             JavaFileObject fileObject = filer.createSourceFile(filename);
-            Writer out = fileObject.openWriter();
-            template.process(root, out);
-            out.close();
+            try (Writer out = fileObject.openWriter()) {
+                template.process(root, out);
+            }
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
         }

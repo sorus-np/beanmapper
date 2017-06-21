@@ -53,6 +53,26 @@ public class BeanClass {
         return null;
     }
 
+    public ExecutableElement getMethod(ExecutableElement from, VariableElement to) {
+        String parameter = from.getReturnType().toString();
+        String returnType = to.asType().toString();
+
+        for (ExecutableElement el : methods) {
+            String actualReturnType = el.getReturnType().toString();
+            if (!actualReturnType.equals(returnType))
+                continue;
+
+            List<? extends VariableElement> parameters = el.getParameters();
+            if (parameters.size() != 1)
+                continue;
+
+            String actualParameter = parameters.get(0).asType().toString();
+            if (actualParameter.equals(parameter))
+                return el;
+        }
+        return null;
+    }
+
     public boolean hasProperty(String name) {
         for (VariableElement el : properties) {
             if (el.getSimpleName().toString().equals(name))

@@ -59,8 +59,12 @@ public class MappingProcessor {
 
             prop.value = prop.to.toString();
             if (annotation != null) {
-                prop.value = (String) getMethodValue(annotation, "value");
-                prop.mapper = (DeclaredType) getMethodValue(annotation, "using");
+                String value = (String) getMethodValue(annotation, "value");
+                if (value != null)
+                    prop.value = value;
+                DeclaredType type = (DeclaredType) getMethodValue(annotation, "using");
+                if (type != null)
+                    prop.mapperClass = (TypeElement) type.asElement();
             }
             mapping.props.add(prop);
         }
@@ -70,6 +74,11 @@ public class MappingProcessor {
             if (fromBean.hasProperty(property.value)) {
                 String getter = fromBean.accessor(property.value, BeanClass.AccessType.GETTER);
                 property.from = fromBean.getMethod(getter);
+            }
+
+            if (property.mapperClass != null) {
+                BeanClass mapperBean = new BeanClass(property.mapperClass);
+                property.mapperMethod = mapperBean.getMethod(property.from, property.to);
             }
         }
 

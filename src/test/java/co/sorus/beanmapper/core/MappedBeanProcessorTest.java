@@ -60,4 +60,16 @@ public class MappedBeanProcessorTest {
                 .hasSourceEquivalentTo(generated);
     }
 
+    @Test
+    public void testMappedProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOMappedProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOMappedPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOMappedPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
+
 }
