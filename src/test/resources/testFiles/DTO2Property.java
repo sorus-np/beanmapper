@@ -1,9 +1,11 @@
 package testFiles;
 
-public class DomainObject {
+import co.sorus.beanmapper.MappedBean;
+
+@MappedBean(from = DomainObject.class)
+public class DTO2Property {
     private long id;
     private int age;
-    private String name;
 
     public long getId() {
         return this.id;
@@ -19,13 +21,5 @@ public class DomainObject {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

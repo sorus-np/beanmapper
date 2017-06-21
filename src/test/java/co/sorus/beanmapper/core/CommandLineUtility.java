@@ -12,7 +12,8 @@ import javax.tools.ToolProvider;
 
 public class CommandLineUtility {
 
-    private static String[] filesToCompile = { "testFiles/DomainObject.java", "testFiles/SimpleDTO.java" };
+    private static String[] filesToCompile = { "testFiles/DomainObject.java", "testFiles/SimpleDTO.java",
+            "testFiles/DTO2Property.java", "testFiles/DTOClassProperty.java" };
 
     public static void main(String[] args) throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

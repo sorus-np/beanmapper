@@ -2,11 +2,14 @@ package co.sorus.beanmapper.core;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.tools.JavaFileObject;
 
 import freemarker.template.Configuration;
@@ -43,6 +46,22 @@ public class MapFileGenerator {
         root.put("qualifiedName", mapping.to.getQualifiedName().toString());
         root.put("toBean", mapping.to.getSimpleName().toString());
         root.put("packageName", getPackage(mapping.to.getQualifiedName().toString()));
+        root.put("fromBean", mapping.from.getQualifiedName().toString());
+
+        List<Map<String, String>> props = new ArrayList<>(mapping.props.size());
+        root.put("properties", props);
+        int index = 0;
+        for (BeanMapping.Property property : mapping.props) {
+            Map<String, String> prop = new HashMap<>();
+            prop.put("index", Integer.toString(index));
+            index++;
+
+            prop.put("fromType", type(property.from));
+            prop.put("fromGetter", accessor(property.from.toString(), "getter"));
+            prop.put("toSetter", accessor(property.from.toString(), "setter"));
+
+            props.add(prop);
+        }
 
         createFile(root);
     }
@@ -66,5 +85,19 @@ public class MapFileGenerator {
             return "";
         else
             return qualifiedName.substring(0, idx);
+    }
+
+    private String accessor(String property, String accessType) {
+        property = property.substring(0, 1).toUpperCase() + property.substring(1);
+        if (accessType.equals("getter"))
+            return "get" + property;
+        else if (accessType.equals("setter"))
+            return "set" + property;
+        else
+            return null;
+    }
+
+    private String type(Element element) {
+        return element.asType().toString();
     }
 }

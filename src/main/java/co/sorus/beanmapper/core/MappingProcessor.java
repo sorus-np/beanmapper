@@ -65,8 +65,9 @@ public class MappingProcessor {
         }
 
         // Get FROM bean mapping
-        for (VariableElement property : destProperties) {
-
+        for (BeanMapping.Property property : mapping.props) {
+            if (!property.hasAnnotation)
+                property.from = property.to;
         }
 
         return mapping;

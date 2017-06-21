@@ -18,6 +18,8 @@ public final class BeanMapping {
     public static class Property {
         protected Element to;
 
+        protected Element from;
+
         protected boolean hasAnnotation;
 
         protected String value;

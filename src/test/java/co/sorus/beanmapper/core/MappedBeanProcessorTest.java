@@ -1,14 +1,51 @@
 package co.sorus.beanmapper.core;
 
-import static org.junit.Assert.*;
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
+import javax.tools.JavaFileObject;
 
 import org.junit.Test;
 
+import com.google.testing.compile.Compilation;
+import com.google.testing.compile.JavaFileObjects;
+
 public class MappedBeanProcessorTest {
 
+    JavaFileObject domainObject = JavaFileObjects.forResource("testFiles/DomainObject.java");
+
     @Test
-    public void test() {
-        fail("Not yet implemented");
+    public void testOnePrimitiveProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/SimpleDTO.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/SimpleDTOGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.SimpleDTOGenerator").hasSourceEquivalentTo(generated);
+    }
+
+    @Test
+    public void testTwoPrimitiveProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTO2Property.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTO2PropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTO2PropertyGenerator").hasSourceEquivalentTo(generated);
+    }
+
+    @Test
+    public void testClassProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOClassProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOClassPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOClassPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
     }
 
 }
