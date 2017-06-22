@@ -14,7 +14,7 @@ public class ${toBean}Generator implements co.sorus.beanmapper.BeanMapper<${from
             ${prop.mapperClass} mapper${prop.index} = new ${prop.mapperClass}();
             _to.${prop.toSetter}( mapper${prop.index}.${prop.mapperMethod}(prop${prop.index}) );
             <#else>
-            _to.${prop.toSetter}(prop${prop.index});
+            _to.${prop.toSetter}(prop${prop.index}<#if prop.mapperAdditional == "true">.toString()</#if>);
             </#if>
 
         } catch (NullPointerException e) {

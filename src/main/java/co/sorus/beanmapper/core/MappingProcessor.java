@@ -20,6 +20,8 @@ public class MappingProcessor {
 
     private DeclaredType mappedFromType;
 
+    private ImplicitConversions conversions;
+
     public MappingProcessor(ProcessingEnvironment processingEnv) {
         this.env = processingEnv;
 
@@ -32,6 +34,8 @@ public class MappingProcessor {
 
         element = env.getElementUtils().getTypeElement("co.sorus.beanmapper.MappedFrom");
         mappedFromType = env.getTypeUtils().getDeclaredType(element);
+
+        this.conversions = new ImplicitConversions(env);
     }
 
     public BeanMapping process(TypeElement toElement) {
@@ -79,6 +83,16 @@ public class MappingProcessor {
             if (property.mapperClass != null) {
                 BeanClass mapperBean = new BeanClass(property.mapperClass);
                 property.mapperMethod = mapperBean.getMethod(property.from, property.to);
+            }
+
+            // If type do not match, try implicit conversion
+            ExecutableElement method = (property.mapperMethod == null ? property.from : property.mapperMethod);
+            String actualType = method.getReturnType().toString();
+            String desiredType = property.to.asType().toString();
+            property.implicitConversion = false;
+            if (!actualType.equals(desiredType)) {
+                if (conversions.attemptConversion(method.getReturnType(), property.to.asType()))
+                    property.implicitConversion = true;
             }
         }
 

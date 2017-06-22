@@ -72,4 +72,16 @@ public class MappedBeanProcessorTest {
                 .hasSourceEquivalentTo(generated);
     }
 
+    @Test
+    public void testEnum2StringProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOEnumProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOEnumPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOEnumPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
+
 }

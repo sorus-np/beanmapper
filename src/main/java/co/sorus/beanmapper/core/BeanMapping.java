@@ -27,5 +27,7 @@ public final class BeanMapping {
         protected TypeElement mapperClass;
         protected ExecutableElement mapperMethod;
 
+        protected boolean implicitConversion = false;
+
     }
 }

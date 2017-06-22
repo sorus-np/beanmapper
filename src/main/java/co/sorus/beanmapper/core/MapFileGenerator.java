@@ -70,6 +70,8 @@ public class MapFileGenerator {
                 prop.put("mapperMethod", property.mapperMethod.getSimpleName().toString());
             }
 
+            prop.put("mapperAdditional", Boolean.toString(property.implicitConversion));
+
             props.add(prop);
         }
 
