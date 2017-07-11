@@ -5,7 +5,7 @@ import co.sorus.beanmapper.MappedFrom;
 
 @MappedBean(from = DomainObject.class)
 public class DTOEmbeddedProperty {
-    
+
     @MappedFrom("embedded.name")
     private String name;
 

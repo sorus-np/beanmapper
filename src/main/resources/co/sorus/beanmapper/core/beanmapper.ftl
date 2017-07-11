@@ -8,11 +8,11 @@ public class ${toBean}Generator implements co.sorus.beanmapper.BeanMapper<${from
 
         <#list properties as prop>
         try {
-            <#if prop.complex == "true">
+          <#if prop.complex == "true">
             ${prop.fromType} prop${prop.index} = _from.${prop.fromGetter};
-            <#else>
+          <#else>
             ${prop.fromType} prop${prop.index} = _from.${prop.fromGetter}();
-            </#if>
+          </#if>
 
             <#if prop.mapperUsed == "true">
             ${prop.mapperClass} mapper${prop.index} = new ${prop.mapperClass}();

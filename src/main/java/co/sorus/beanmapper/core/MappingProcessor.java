@@ -83,6 +83,12 @@ public class MappingProcessor {
             if (property.value.indexOf(".") > -1) {
                 property.isComplex = true;
                 property.methods = handleComplexMapper(property.value, mapping.from);
+
+                if (property.mapperClass != null) {
+                    BeanClass mapperBean = new BeanClass(property.mapperClass);
+                    Element lastElement = property.methods.get(property.methods.size() - 1);
+                    property.mapperMethod = mapperBean.getMethod(lastElement, property.to);
+                }
                 continue;
             }
 

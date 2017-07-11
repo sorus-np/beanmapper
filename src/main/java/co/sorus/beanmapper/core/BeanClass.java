@@ -6,6 +6,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
 public class BeanClass {
@@ -53,9 +54,9 @@ public class BeanClass {
         return null;
     }
 
-    public ExecutableElement getMethod(ExecutableElement from, VariableElement to) {
-        String parameter = from.getReturnType().toString();
-        String returnType = to.asType().toString();
+    public ExecutableElement getMethod(Element from, Element to) {
+        String parameter = type(from);
+        String returnType = type(to);
 
         for (ExecutableElement el : methods) {
             String actualReturnType = el.getReturnType().toString();
@@ -71,6 +72,16 @@ public class BeanClass {
                 return el;
         }
         return null;
+    }
+
+    private String type(Element element) {
+        if (element instanceof VariableElement)
+            return element.asType().toString();
+        else if (element instanceof ExecutableElement) {
+            TypeMirror returnType = ((ExecutableElement) element).getReturnType();
+            return returnType.toString();
+        }
+        return "";
     }
 
     public boolean hasProperty(String name) {

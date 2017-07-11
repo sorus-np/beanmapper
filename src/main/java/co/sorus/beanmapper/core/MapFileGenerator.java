@@ -63,18 +63,17 @@ public class MapFileGenerator {
             prop.put("fromType", type(property.from));
             prop.put("complex", (property.isComplex ? "true" : "false"));
             if (property.isComplex) {
-                String functions = property.methods.stream().map(m -> getName(m)).collect(Collectors.joining("."));
-                prop.put("fromGetter", functions);
-                prop.put("fromType", type(property.to));
-            } else
+                handleComplex(property, prop);
+            } else {
                 prop.put("fromGetter", property.from.getSimpleName().toString());
-            prop.put("toSetter", accessor(property.to.toString(), "setter"));
+                prop.put("toSetter", accessor(property.to.toString(), "setter"));
 
-            prop.put("mapperUsed", "false");
-            if (property.mapperClass != null) {
-                prop.put("mapperUsed", "true");
-                prop.put("mapperClass", property.mapperClass.getQualifiedName().toString());
-                prop.put("mapperMethod", property.mapperMethod.getSimpleName().toString());
+                prop.put("mapperUsed", "false");
+                if (property.mapperClass != null) {
+                    prop.put("mapperUsed", "true");
+                    prop.put("mapperClass", property.mapperClass.getQualifiedName().toString());
+                    prop.put("mapperMethod", property.mapperMethod.getSimpleName().toString());
+                }
             }
 
             prop.put("mapperAdditional", Boolean.toString(property.implicitConversion));
@@ -83,6 +82,21 @@ public class MapFileGenerator {
         }
 
         createFile(root);
+    }
+
+    private void handleComplex(BeanMapping.Property property, Map<String, String> prop) {
+        String functions = property.methods.stream().map(m -> getName(m)).collect(Collectors.joining("."));
+        prop.put("fromGetter", functions);
+        Element lastElement = property.methods.get(property.methods.size() - 1);
+        prop.put("fromType", type(lastElement));
+
+        prop.put("toSetter", accessor(property.to.toString(), "setter"));
+        prop.put("mapperUsed", "false");
+        if (property.mapperClass != null) {
+            prop.put("mapperUsed", "true");
+            prop.put("mapperClass", property.mapperClass.getQualifiedName().toString());
+            prop.put("mapperMethod", property.mapperMethod.getSimpleName().toString());
+        }
     }
 
     private String getName(Element el) {
