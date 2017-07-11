@@ -1,5 +1,6 @@
 package co.sorus.beanmapper.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+
+import co.sorus.beanmapper.core.BeanClass.AccessType;
 
 public class MappingProcessor {
 
@@ -75,6 +79,15 @@ public class MappingProcessor {
 
         // Get FROM bean mapping
         for (BeanMapping.Property property : mapping.props) {
+
+            if (property.value.indexOf(".") > -1) {
+                property.isComplex = true;
+                property.methods = handleComplexMapper(property.value, mapping.from);
+                continue;
+            }
+
+            property.isComplex = false;
+
             if (fromBean.hasProperty(property.value)) {
                 String getter = fromBean.accessor(property.value, BeanClass.AccessType.GETTER);
                 property.from = fromBean.getMethod(getter);
@@ -97,6 +110,34 @@ public class MappingProcessor {
         }
 
         return mapping;
+    }
+
+    private List<Element> handleComplexMapper(String value, TypeElement source) {
+
+        List<Element> froms = new ArrayList<>();
+        for (String mapper : value.split("\\.")) {
+            BeanClass bean = new BeanClass(source);
+
+            if (bean.hasProperty(mapper)) {
+                String getter = bean.accessor(mapper, AccessType.GETTER);
+                if (bean.hasMethod(getter)) {
+                    ExecutableElement method = bean.getMethod(getter);
+                    froms.add(method);
+                    TypeMirror typeMirror = method.getReturnType();
+                    if (typeMirror.getKind().isPrimitive()) {
+                        // TODO handle primitive
+                    } else {
+                        DeclaredType declaredType = (DeclaredType) typeMirror;
+                        source = (TypeElement) declaredType.asElement();
+                    }
+                } else {
+                    // TODO - handle property
+                }
+
+            }
+        }
+
+        return froms;
     }
 
     private AnnotationMirror getAnnotation(Element element, DeclaredType type, boolean mandatory) {

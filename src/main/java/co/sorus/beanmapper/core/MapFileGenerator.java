@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -60,7 +61,13 @@ public class MapFileGenerator {
             index++;
 
             prop.put("fromType", type(property.from));
-            prop.put("fromGetter", property.from.getSimpleName().toString());
+            prop.put("complex", (property.isComplex ? "true" : "false"));
+            if (property.isComplex) {
+                String functions = property.methods.stream().map(m -> getName(m)).collect(Collectors.joining("."));
+                prop.put("fromGetter", functions);
+                prop.put("fromType", type(property.to));
+            } else
+                prop.put("fromGetter", property.from.getSimpleName().toString());
             prop.put("toSetter", accessor(property.to.toString(), "setter"));
 
             prop.put("mapperUsed", "false");
@@ -76,6 +83,12 @@ public class MapFileGenerator {
         }
 
         createFile(root);
+    }
+
+    private String getName(Element el) {
+        if (el instanceof ExecutableElement)
+            return el.getSimpleName().toString() + "()";
+        return el.getSimpleName().toString();
     }
 
     private void createFile(Map<String, Object> root) {

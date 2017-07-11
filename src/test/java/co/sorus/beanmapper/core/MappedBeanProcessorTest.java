@@ -13,13 +13,15 @@ import com.google.testing.compile.JavaFileObjects;
 public class MappedBeanProcessorTest {
 
     JavaFileObject domainObject = JavaFileObjects.forResource("testFiles/DomainObject.java");
+    JavaFileObject embeddedObject = JavaFileObjects.forResource("testFiles/EmbeddedObject.java");
 
     @Test
     public void testOnePrimitiveProperty() {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/SimpleDTO.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/SimpleDTOGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.SimpleDTOGenerator").hasSourceEquivalentTo(generated);
@@ -30,7 +32,8 @@ public class MappedBeanProcessorTest {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTO2Property.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTO2PropertyGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTO2PropertyGenerator").hasSourceEquivalentTo(generated);
@@ -41,7 +44,8 @@ public class MappedBeanProcessorTest {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOClassProperty.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOClassPropertyGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTOClassPropertyGenerator")
@@ -53,7 +57,8 @@ public class MappedBeanProcessorTest {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTORenamedProperty.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTORenamedPropertyGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTORenamedPropertyGenerator")
@@ -65,7 +70,8 @@ public class MappedBeanProcessorTest {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOMappedProperty.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOMappedPropertyGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTOMappedPropertyGenerator")
@@ -77,10 +83,24 @@ public class MappedBeanProcessorTest {
         JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOEnumProperty.java");
         JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOEnumPropertyGenerator.java");
 
-        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject);
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTOEnumPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
+
+    @Test
+    public void testEmbeddedProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOEmbeddedProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOEmbeddedPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOEmbeddedPropertyGenerator")
                 .hasSourceEquivalentTo(generated);
     }
 

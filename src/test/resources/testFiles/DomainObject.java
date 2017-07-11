@@ -7,6 +7,7 @@ public class DomainObject {
     private int age;
     private String name;
     private DayOfWeek day;
+    private EmbeddedObject embedded;
 
     public long getId() {
         return this.id;
@@ -38,5 +39,13 @@ public class DomainObject {
 
     public DayOfWeek getDay() {
         return this.day;
+    }
+
+    public void setEmbedded(EmbeddedObject embedded) {
+        this.embedded = embedded;
+    }
+
+    public EmbeddedObject getEmbedded() {
+        return this.embedded;
     }
 }
