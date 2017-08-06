@@ -15,7 +15,8 @@ public class CommandLineUtility {
     private static String[] filesToCompile = { "testFiles/DomainObject.java", "testFiles/EmbeddedObject.java",
             "testFiles/SimpleDTO.java", "testFiles/DTO2Property.java", "testFiles/DTOClassProperty.java",
             "testFiles/DTORenamedProperty.java", "testFiles/DTOMappedProperty.java", "testFiles/DTOEnumProperty.java",
-            "testFiles/DTOEmbeddedProperty.java", "testFiles/DTOEmbeddedMappedProperty.java" };
+            "testFiles/DTOEmbeddedProperty.java", "testFiles/DTOEmbeddedMappedProperty.java",
+            "testFiles/DTOUnmappedProperty.java" };
 
     public static void main(String[] args) throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

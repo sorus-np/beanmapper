@@ -24,6 +24,8 @@ public class MappingProcessor {
 
     private DeclaredType mappedFromType;
 
+    private DeclaredType unmappedType;
+
     private ImplicitConversions conversions;
 
     public MappingProcessor(ProcessingEnvironment processingEnv) {
@@ -38,6 +40,9 @@ public class MappingProcessor {
 
         element = env.getElementUtils().getTypeElement("co.sorus.beanmapper.MappedFrom");
         mappedFromType = env.getTypeUtils().getDeclaredType(element);
+
+        element = env.getElementUtils().getTypeElement("co.sorus.beanmapper.Unmapped");
+        unmappedType = env.getTypeUtils().getDeclaredType(element);
 
         this.conversions = new ImplicitConversions(env);
     }
@@ -60,6 +65,12 @@ public class MappingProcessor {
         // Get TO bean properties
         List<VariableElement> destProperties = toBean.getProperties();
         for (VariableElement property : destProperties) {
+
+            // if unmapped, do not generate mapping
+            if (getAnnotation(property, unmappedType, false) != null) {
+                continue;
+            }
+
             BeanMapping.Property prop = new BeanMapping.Property();
             prop.to = property;
             AnnotationMirror annotation = getAnnotation(property, mappedFromType, false);
@@ -106,12 +117,14 @@ public class MappingProcessor {
 
             // If type do not match, try implicit conversion
             ExecutableElement method = (property.mapperMethod == null ? property.from : property.mapperMethod);
-            String actualType = method.getReturnType().toString();
-            String desiredType = property.to.asType().toString();
-            property.implicitConversion = false;
-            if (!actualType.equals(desiredType)) {
-                if (conversions.attemptConversion(method.getReturnType(), property.to.asType()))
-                    property.implicitConversion = true;
+            if (method != null) {
+                String actualType = method.getReturnType().toString();
+                String desiredType = property.to.asType().toString();
+                property.implicitConversion = false;
+                if (!actualType.equals(desiredType)) {
+                    if (conversions.attemptConversion(method.getReturnType(), property.to.asType()))
+                        property.implicitConversion = true;
+                }
             }
         }
 

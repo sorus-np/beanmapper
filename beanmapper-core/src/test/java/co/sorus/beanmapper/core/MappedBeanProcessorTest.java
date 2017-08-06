@@ -117,4 +117,16 @@ public class MappedBeanProcessorTest {
                 .hasSourceEquivalentTo(generated);
     }
 
+    @Test
+    public void testUnmappedProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOUnmappedProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOUnmappedPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                embeddedObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOUnmappedPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
 }
