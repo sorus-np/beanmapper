@@ -12,6 +12,8 @@ public final class BeanMapping {
 
     protected TypeElement from;
 
+    protected List<TypeElement> fromSuperClasses;
+
     protected TypeElement to;
 
     protected List<Property> props = new ArrayList<>();

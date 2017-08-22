@@ -17,7 +17,7 @@ public class CommandLineUtility {
             "testFiles/DTOClassProperty.java", "testFiles/DTORenamedProperty.java", "testFiles/DTOMappedProperty.java",
             "testFiles/DTOEnumProperty.java", "testFiles/DTOEmbeddedProperty.java",
             "testFiles/DTOEmbeddedMappedProperty.java", "testFiles/DTOUnmappedProperty.java",
-            "testFiles/DTOSubclassProperty.java" };
+            "testFiles/DTOSubclassProperty.java", "testFiles/DTOSubclassSuperProperty.java" };
 
     public static void main(String[] args) throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

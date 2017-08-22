@@ -62,8 +62,86 @@ public class MappingProcessor {
         BeanClass fromBean = new BeanClass(fromElement);
         mapping.from = fromElement;
 
+        // Get super class of from bean
+        mapping.fromSuperClasses = new ArrayList<>();
+        for (TypeMirror supertypes : env.getTypeUtils().directSupertypes(fromElement.asType())) {
+            DeclaredType declaredType = (DeclaredType) supertypes;
+            TypeElement supertypeElement = (TypeElement) declaredType.asElement();
+            mapping.fromSuperClasses.add(supertypeElement);
+        }
+
         // Get TO bean properties
-        List<VariableElement> destProperties = toBean.getProperties();
+        getDestinationProperties(toBean.getProperties(), mapping);
+
+        // Get FROM bean mapping
+        for (BeanMapping.Property property : mapping.props)
+            getPropertyMapping(property, mapping.from, fromBean, mapping.fromSuperClasses);
+
+        return mapping;
+    }
+
+    private ExecutableElement getExplicitMapping(BeanMapping.Property property, TypeElement source,
+            BeanClass fromBean) {
+        if (fromBean.hasProperty(property.value)) {
+            String getter = fromBean.accessor(property.value, BeanClass.AccessType.GETTER);
+            return fromBean.getMethod(getter);
+        }
+        return null;
+    }
+
+    private void getPropertyMapping(BeanMapping.Property property, TypeElement source, BeanClass fromBean,
+            List<TypeElement> superTypes) {
+        if (isComplexMapping(property.value)) {
+            property.isComplex = true;
+            property.methods = handleComplexMapper(property.value, source);
+
+            if (property.mapperClass != null) {
+                BeanClass mapperBean = new BeanClass(property.mapperClass);
+                Element lastElement = property.methods.get(property.methods.size() - 1);
+                property.mapperMethod = mapperBean.getMethod(lastElement, property.to);
+            }
+            return;
+        }
+
+        property.isComplex = false;
+
+        ExecutableElement mappedFrom = getExplicitMapping(property, source, fromBean);
+        for (TypeElement superType : superTypes) {
+            if (mappedFrom != null)
+                break;
+
+            // Look for property in super classes
+            BeanClass superBean = new BeanClass(superType);
+            mappedFrom = getExplicitMapping(property, source, superBean);
+        }
+
+        if (mappedFrom != null)
+            property.from = mappedFrom;
+
+        if (property.mapperClass != null) {
+            BeanClass mapperBean = new BeanClass(property.mapperClass);
+            property.mapperMethod = mapperBean.getMethod(property.from, property.to);
+        }
+
+        // If type do not match, try implicit conversion
+        ExecutableElement method = (property.mapperMethod == null ? property.from : property.mapperMethod);
+        if (method != null) {
+            String actualType = method.getReturnType().toString();
+            String desiredType = property.to.asType().toString();
+            property.implicitConversion = false;
+            if (!actualType.equals(desiredType)) {
+                if (conversions.attemptConversion(method.getReturnType(), property.to.asType()))
+                    property.implicitConversion = true;
+            }
+        }
+    }
+
+    private boolean isComplexMapping(String value) {
+        return value.indexOf(".") > -1;
+    }
+
+    private void getDestinationProperties(List<VariableElement> destProperties, BeanMapping mapping) {
+        // List<VariableElement> destProperties = toBean.getProperties();
         for (VariableElement property : destProperties) {
 
             // if unmapped, do not generate mapping
@@ -87,48 +165,6 @@ public class MappingProcessor {
             }
             mapping.props.add(prop);
         }
-
-        // Get FROM bean mapping
-        for (BeanMapping.Property property : mapping.props) {
-
-            if (property.value.indexOf(".") > -1) {
-                property.isComplex = true;
-                property.methods = handleComplexMapper(property.value, mapping.from);
-
-                if (property.mapperClass != null) {
-                    BeanClass mapperBean = new BeanClass(property.mapperClass);
-                    Element lastElement = property.methods.get(property.methods.size() - 1);
-                    property.mapperMethod = mapperBean.getMethod(lastElement, property.to);
-                }
-                continue;
-            }
-
-            property.isComplex = false;
-
-            if (fromBean.hasProperty(property.value)) {
-                String getter = fromBean.accessor(property.value, BeanClass.AccessType.GETTER);
-                property.from = fromBean.getMethod(getter);
-            }
-
-            if (property.mapperClass != null) {
-                BeanClass mapperBean = new BeanClass(property.mapperClass);
-                property.mapperMethod = mapperBean.getMethod(property.from, property.to);
-            }
-
-            // If type do not match, try implicit conversion
-            ExecutableElement method = (property.mapperMethod == null ? property.from : property.mapperMethod);
-            if (method != null) {
-                String actualType = method.getReturnType().toString();
-                String desiredType = property.to.asType().toString();
-                property.implicitConversion = false;
-                if (!actualType.equals(desiredType)) {
-                    if (conversions.attemptConversion(method.getReturnType(), property.to.asType()))
-                        property.implicitConversion = true;
-                }
-            }
-        }
-
-        return mapping;
     }
 
     private List<Element> handleComplexMapper(String value, TypeElement source) {

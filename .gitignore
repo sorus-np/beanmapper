@@ -16,4 +16,4 @@ target
 *.war
 
 # This project temp resources
-testFiles/
+/beanmapper-core/testFiles/

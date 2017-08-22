@@ -143,4 +143,17 @@ public class MappedBeanProcessorTest {
         assertThat(compilation).generatedSourceFile("testFiles.DTOSubclassPropertyGenerator")
                 .hasSourceEquivalentTo(generated);
     }
+
+    @Test
+    public void testSubclassPropertyInSuperClass() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOSubclassSuperProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOSubclassSuperPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                domainSubclass, embeddedObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOSubclassSuperPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
 }
