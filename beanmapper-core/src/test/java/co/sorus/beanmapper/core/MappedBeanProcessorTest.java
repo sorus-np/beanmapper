@@ -13,6 +13,7 @@ import com.google.testing.compile.JavaFileObjects;
 public class MappedBeanProcessorTest {
 
     JavaFileObject domainObject = JavaFileObjects.forResource("testFiles/DomainObject.java");
+    JavaFileObject domainSubclass = JavaFileObjects.forResource("testFiles/DomainSubclass.java");
     JavaFileObject embeddedObject = JavaFileObjects.forResource("testFiles/EmbeddedObject.java");
 
     @Test
@@ -127,6 +128,19 @@ public class MappedBeanProcessorTest {
 
         assertThat(compilation).succeededWithoutWarnings();
         assertThat(compilation).generatedSourceFile("testFiles.DTOUnmappedPropertyGenerator")
+                .hasSourceEquivalentTo(generated);
+    }
+
+    @Test
+    public void testSubclassProperty() {
+        JavaFileObject dto = JavaFileObjects.forResource("testFiles/DTOSubclassProperty.java");
+        JavaFileObject generated = JavaFileObjects.forResource("testFiles/DTOSubclassPropertyGenerator.java");
+
+        Compilation compilation = javac().withProcessors(new MappedBeanProcessor()).compile(dto, domainObject,
+                domainSubclass, embeddedObject);
+
+        assertThat(compilation).succeededWithoutWarnings();
+        assertThat(compilation).generatedSourceFile("testFiles.DTOSubclassPropertyGenerator")
                 .hasSourceEquivalentTo(generated);
     }
 }
